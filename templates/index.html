@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Контроль дефектов листового проката</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">NEU-YOLO / YOLO</p>
+        <h1>Автоматическое обнаружение дефектов поверхности листового проката</h1>
+        <p class="subtitle">
+          Загрузите изображение поверхности металла. Система выполнит детекцию дефектов,
+          выделит bounding boxes, покажет класс, confidence и итоговый статус проверки.
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="metric-title">Назначение</div>
+        <div class="metric-value">Визуальный контроль качества</div>
+        <div class="metric-note">Подходит как пилотный веб-интерфейс для оператора или инженера ОТК.</div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card upload-card">
+        <h2>Загрузка изображения</h2>
+        <form action="/predict" method="post" enctype="multipart/form-data" class="upload-form">
+          <label class="file-picker">
+            <span>Выберите файл</span>
+            <input type="file" name="file" accept=".jpg,.jpeg,.png,.bmp,.webp" required>
+          </label>
+          <button type="submit">Запустить детекцию</button>
+        </form>
+        <div class="tips">
+          <p><strong>Рекомендуется:</strong> использовать изображения с камеры контроля качества или снимки поверхности листа.</p>
+          <p><strong>Поддерживаемые форматы:</strong> JPG, PNG, BMP, WEBP.</p>
+        </div>
+        {% if error %}
+        <div class="alert error">{{ error }}</div>
+        {% endif %}
+      </section>
+
+      <section class="card result-card">
+        <h2>Результат анализа</h2>
+        {% if meta %}
+        <div class="meta-grid">
+          <div><span>Файл</span><strong>{{ meta.filename }}</strong></div>
+          <div><span>Размер</span><strong>{{ meta.width }} × {{ meta.height }}</strong></div>
+          <div><span>Найдено дефектов</span><strong>{{ meta.detections_count }}</strong></div>
+          <div><span>Статус</span><strong>{{ meta.status }}</strong></div>
+          <div><span>CONF</span><strong>{{ meta.conf_threshold }}</strong></div>
+          <div><span>IOU</span><strong>{{ meta.iou_threshold }}</strong></div>
+        </div>
+        {% else %}
+        <p class="placeholder">После запуска здесь появятся результат и сводка по найденным дефектам.</p>
+        {% endif %}
+
+        {% if result_image_url %}
+        <div class="image-wrap">
+          <img src="{{ result_image_url }}" alt="Результат детекции">
+        </div>
+        {% endif %}
+      </section>
+    </main>
+
+    <section class="card table-card">
+      <h2>Детекции</h2>
+      {% if detections %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Класс дефекта</th>
+            <th>Описание</th>
+            <th>Confidence</th>
+            <th>Bounding box</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in detections %}
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.class_name }}</td>
+            <td>{{ item.description }}</td>
+            <td>{{ item.confidence }}</td>
+            <td>{{ item.bbox }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="placeholder">Пока нет данных для отображения.</p>
+      {% endif %}
+    </section>
+
+    <section class="card footer-card">
+      <h2>Как это можно внедрить в цех</h2>
+      <ol>
+        <li>Подключить промышленную камеру над линией или постом контроля качества.</li>
+        <li>Передавать кадры на сервер с моделью YOLO через API.</li>
+        <li>Показывать оператору изображение с дефектами и решение: ОК / брак / ручная проверка.</li>
+        <li>Сохранять результат в журнал и использовать новые кейсы для дообучения модели.</li>
+      </ol>
+    </section>
+  </div>
+</body>
+</html>

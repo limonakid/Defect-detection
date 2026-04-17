@@ -40,6 +40,8 @@ py -3.8 -m uvicorn app:app --reload
 ```text
 http://127.0.0.1:8000
 ```
+### Ссылка на модель
+https://drive.google.com/file/d/1clYGBZxHlNrEHO6eBmS-iXtynYxVuRGq/view?usp=sharing
 
 ## Как это расширить до производственного уровня
 - принимать кадры не вручную, а с промышленной камеры;
